@@ -1,4 +1,6 @@
 from os import stat
+from aiogram.types.base import String
+import json
 import requests
 from hashlib import md5
 from xml.etree import ElementTree
@@ -15,13 +17,32 @@ from source.telegram_bot.bot import dp, db, bot
 from source.telegram_bot.kb import home_kb
 import source.telegram_bot.strings as strings
 
+from source.settings import SERVER_HOST_AUTH_URL, SERVER_HOST_PROTOCOL
+
+
+req_headers = {
+    'Content-type': 'application/json',
+    'Accept': 'text/plain',
+    'Content-Encoding': 'utf-8'
+}
 
 class SelectTanomenr(StatesGroup):
     waiting_for_input = State()
 
 async def send_welcome(message: types.Message):
-    db.add_user(message.from_user.id, message.from_user.full_name)
-    await message.answer(strings.start_content, parse_mode='MarkdownV2', reply_markup=ReplyKeyboardRemove())
+
+    data = {
+        "bot_type": "telegram",
+        "user_id": str(message.from_user.id)
+    }
+
+    print(SERVER_HOST_PROTOCOL + "://" + SERVER_HOST_AUTH_URL)
+    response = requests.post(
+        SERVER_HOST_PROTOCOL + "://" + SERVER_HOST_AUTH_URL,
+        data=json.dumps(data),
+        headers=req_headers)
+
+    await message.answer(strings.start_content, reply_markup=ReplyKeyboardRemove())
     await message.answer(strings.choice_tanometr, parse_mode='MarkdownV2')
     await SelectTanomenr.next()
 
@@ -39,33 +60,6 @@ async def select_tanometr_cancle(message: types.Message, state: FSMContext):
     await message.answer(strings.choice_tanometr_cancle, parse_mode='MarkdownV2', reply_markup=home_kb(message.from_user.id))
     await state.finish()
 
-from source.voice_settings import YANDEX_KEY, VOICE_LANGUAGE, MAX_MESSAGE_SIZE, MAX_MESSAGE_DURATION
-from source.settings import BOT_TOKEN
-
-from google.cloud import speech
-
-async def voice_message(message: types.Message):
-    data = message.voice
-    file_url = await data.get_url()
-
-    client = speech.SpeechClient()
-    # [END speech_python_migration_client]
-
-    # The name of the audio file to transcribe
-    gcs_uri = "gs://cloud-samples-data/speech/brooklyn_bridge.raw"
-
-    audio = speech.RecognitionAudio(uri=file_url)
-
-    config = speech.RecognitionConfig(
-        encoding=speech.RecognitionConfig.AudioEncoding.OGG_OPUS,
-        sample_rate_hertz=16000,
-        language_code="ru-RU",
-    )
-
-    response = client.recognize(config=config, audio=audio)
-    for result in response.results:
-        await message.answer("Transcript: {}".format(result.alternatives[0].transcript))
-
 async def home_cmd(message: types.Message):
     await message.answer(strings.main_menu, parse_mode='MarkdownV2', reply_markup=home_kb(message.from_user.id))
 
@@ -78,8 +72,6 @@ def register_handlers(dp: Dispatcher):
     dp.register_message_handler(select_tanometr_cancle, Text(equals=strings.write_pressure_cancle_btn), state=SelectTanomenr.all_states)
     dp.register_message_handler(select_tanometr_cancle, commands=['cancle'], state=SelectTanomenr.all_states)
     dp.register_message_handler(select_tanometr_input, state=SelectTanomenr.waiting_for_input)
-
-    dp.register_message_handler(voice_message, content_types=ContentType.VOICE, state=default_state)
 
 
 __all__ = ['register_handlers']

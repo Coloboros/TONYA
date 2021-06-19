@@ -22,7 +22,6 @@ db = DataBase()
 def run_bot():
     handlers_dir_name = 'handlers'
     handlers_path = os.path.join(os.path.dirname(__file__), handlers_dir_name)
-    print(handlers_path)
 
     for module in os.listdir(handlers_path):
         if module == '__init__.py' or module[-3:] != '.py':
