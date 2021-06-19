@@ -12,7 +12,7 @@ for module in os.listdir(routes_path):
     if module == '__init__.py' or module[-3:] != '.py':
         continue
     __import__('source.server.' + routes_dir_name + '.' + module[:-3], locals(), globals())
-del module
+    del module
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')

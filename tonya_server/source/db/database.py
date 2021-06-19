@@ -13,17 +13,17 @@ class DataBase:
     def __init__(self):
         self.session = Session()
 
-    def add_user(self, id, name):
+    def add_user(self, id, name) -> User:
         is_exist = self.session.query(User.id).\
                     filter(User.id == id).all() != []
         if is_exist:
-            return False
+            return None
 
         user = User(id, name)
         self.session.add(user)
         self.session.commit()
 
-        return True
+        return user
 
     def get_users(self):
         return self.session.query(User).all()
@@ -44,5 +44,20 @@ class DataBase:
         user.phone = user_phone
         self.session.commit()
         return True
+
+    def generate_tocken(self, user) -> Tocken:
+        tocken = Tocken(str(user.id) + ':' + user.name)
+        self.session.add(tocken)
+        self.session.commit()
+
+        return tocken
+
+    def get_tocken(self, tocken_value):
+        finded_tockens = self.session.query(Tocken).\
+                    filter(Tocken.value == tocken_value).all()
+        if finded_tockens != []:
+            return finded_tockens[0]
+        else:
+            return None
 
 __all__ = ['DataBase']

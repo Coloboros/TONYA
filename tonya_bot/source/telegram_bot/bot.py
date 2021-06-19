@@ -1,3 +1,6 @@
+import os
+from importlib import import_module
+
 import logging
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -17,14 +20,17 @@ db = DataBase()
 
 
 def run_bot():
+    handlers_dir_name = 'handlers'
+    handlers_path = os.path.join(os.path.dirname(__file__), handlers_dir_name)
+    print(handlers_path)
 
-    from source.telegram_bot.handlers.general import register_handlers_general
-    from source.telegram_bot.handlers.faq import register_handlers_faq
-    from source.telegram_bot.handlers.write_pressure import register_handlers_write_pressure
-
-    register_handlers_faq(dp)
-    register_handlers_general(dp)
-    register_handlers_write_pressure(dp)
+    for module in os.listdir(handlers_path):
+        if module == '__init__.py' or module[-3:] != '.py':
+            continue
+        module_name = 'source.telegram_bot.' + handlers_dir_name + '.' + module[:-3]
+        md = import_module(module_name)
+        md.register_handlers(dp)
+        del md
 
     executor.start_polling(dp, skip_updates=True)
 

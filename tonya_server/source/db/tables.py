@@ -1,5 +1,5 @@
 import datetime
-from sqlalchemy import Column, Integer, String, ForeignKey, Table ,DateTime
+from sqlalchemy import Sequence, Column, Integer, String, ForeignKey, Table ,DateTime
 from sqlalchemy.orm import relationship
 from .init_pre import Base
 
@@ -8,6 +8,7 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     phone = Column(String)
     name = Column(String)
+    child_bots = relationship("Bot")
 
     def __init__(self, id, name):
         self.id = id
@@ -16,21 +17,23 @@ class User(Base):
     def __repr__(self):
         return "<User('%s','%s', '%s', '%s')>" % (self.id, self.name, self.phone, self.requisites)
 
-class Admin(Base):
-    __tablename__ = 'admin'
+class Bot(Base):
+    __tablename__ = 'bot'
     id = Column(Integer, primary_key=True)
+    type = Column(String)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    parent = relationship("User", back_populates="child_bots")
 
-    def __init__(self, id):
-        self.id = id
+class Tocken(Base):
+    __tablename__ = 'auth_tocken'
+    id = Column('id', Integer, Sequence('some_id_seq'), primary_key=True)
+    create_time = Column(DateTime, default=datetime.datetime.utcnow)
+    value = Column(String)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    parent = relationship("User")
 
-class File(Base):
-    __tablename__ = 'file'
-    id = Column(Integer, primary_key=True)
-    file_id = Column(String(255))
-    created_date = Column(DateTime, default=datetime.datetime.utcnow)
-
-    def __init__(self, file_id):
-        self.file_id = file_id
+    def __init__(self, value):
+        self.value = value
 
 # association_files_seller = Table('offer_file1', Base.metadata,
 #     Column('offer_id', Integer, ForeignKey('offer.id')),

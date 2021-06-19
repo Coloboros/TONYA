@@ -1,5 +1,13 @@
+#env
 venv
 .vscode
+
+#cache
 __pycache__
-*/source/settings.py
 *.pyc
+
+#secret
+*/source/settings.py
+
+#voice_from_bot
+tonya_bot/voice

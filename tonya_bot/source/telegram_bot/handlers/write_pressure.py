@@ -41,11 +41,11 @@ async def write_pressure_input_tags(message: types.Message, state: FSMContext):
     await message.answer(strings.write_pressure_finish, parse_mode='MarkdownV2', reply_markup=home_kb(message.from_user.id))
     await state.finish()
 
-def register_handlers_write_pressure(dp: Dispatcher):
+def register_handlers(dp: Dispatcher):
     dp.register_message_handler(write_pressure_start, Text(equals=strings.write_pressure_btn), state=default_state)
     dp.register_message_handler(write_pressure_input_val, state=WritePressure.waiting_for_val)
     dp.register_message_handler(write_pressure_input_tags, state=WritePressure.waiting_for_tags)
 
 
 
-__all__ = ['register_handlers_write_pressure']
+__all__ = ['register_handlers']
