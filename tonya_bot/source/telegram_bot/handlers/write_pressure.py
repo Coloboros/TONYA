@@ -32,7 +32,7 @@ async def write_pressure_input_val(message: types.Message):
     vals = message.text.strip().split(' ')
     is_ints = all([is_int(val) for val in vals])
     if (len(vals) != 3 or not is_ints):
-        await message.answer(strings.write_pressure_input_val_invalid, parse_mode='MarkdownV2')
+        await message.answer(strings.write_pressure_input_val_invalid)
     else:
         await message.answer(strings.write_pressure_input_tags, parse_mode='MarkdownV2')
         await WritePressure.next()
