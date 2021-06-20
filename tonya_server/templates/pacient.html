@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}
+  Picient:
+  {{ pacient.id }}
+{% endblock title %}
+
+{% block content %}
+  <div class="container">
+    <div class="row">
+      <div class="col-3 mt-5">
+        <h2 class="text-center">{{ pacient.id }}</h2>
+        <p class="h3 text-center">Дата рожения:
+          {{ pacient.birthday.strftime("%d/%m/%y") }}</p>
+        <p class="h3 text-center">Рост:
+          {{ pacient.height / 100 }}м.</p>
+        <p class="h3 text-center">Вес:
+          {{ pacient.weight }}кг.</p>
+      </div>
+      <div class="col-9">
+        <img class="w-100" src="{{  url_for('static', filename='images/graphic.jpg')  }}" alt="">
+      </div>
+    </div>
+    <div class="row mt-5">
+      <form action="{{ pacient.id }}" method='POST'>
+        <div class="form-group">
+          <textarea class="form-control" id="message" rows="2"></textarea>
+          <input class="btn btn-success w-100" type="submit" value="Отправить">
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock content %}
+
+{% block footer %}
+  {{ super() }}
+  <script src="{{ url_for('static', filename='js/chartist.min.js')  }}"></script>
+  <script src="{{  url_for('static', filename='js/main.js')  }}"></script>
+
+{% endblock footer %}
+
+{% block header %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/chartist.min.css')  }}">
+
+{% endblock header %}

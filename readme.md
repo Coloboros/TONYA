@@ -17,7 +17,7 @@
 
 В среде выполнить *export GOOGLE_APPLICATION_CREDENTIALS="/path/to/key"
 
-Подробнее https://cloud.google.com/docs/authentication/getting-started
+Подробнее https://cloud.google.com/speech-to-text/docs/quickstart-protocol
 
 В среде tonya_bot запуск *python tonya_bot/bot.py*
 
