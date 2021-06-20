@@ -1,0 +1,4 @@
+from source.lib.aiogram_calendar.simple_calendar import calendar_callback as simple_cal_callback, SimpleCalendar
+from source.lib.aiogram_calendar.dialog_calendar import calendar_callback as dialog_cal_callback, DialogCalendar
+from source.lib.aiogram_calendar.month_calendar import calendar_callback as month_cal_callback, MonthCalendar
+from source.lib.aiogram_calendar.year_calendar import calendar_callback as year_cal_callback, YearCalendar

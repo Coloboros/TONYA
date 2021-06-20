@@ -4,7 +4,7 @@ from flask import request
 from flask import jsonify
 
 from source.server.app import app
-from source.settings import ROUTES_API_PREFIX, CRYPTO_KEY
+from source.settings import ROUTES_API_PREFIX
 from source.db.database import DataBase
 
 auth_url = f'/{ROUTES_API_PREFIX}/user/auth'

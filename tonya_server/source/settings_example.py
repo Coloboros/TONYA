@@ -13,5 +13,3 @@ TELEGRAM_BOT_TOKEN = 'postgresql://{}:{}@{}:{}/{}'.format(
     POSTGRES_PARAMS['port'],
     POSTGRES_PARAMS['database']
 )
-
-BOT_TOKEN = '123:qwe-ewq-asdsad'

@@ -8,6 +8,7 @@ __pycache__
 
 #secret
 */source/settings.py
+*/source/voice_settings.py
 
 #voice_from_bot
 tonya_bot/voice

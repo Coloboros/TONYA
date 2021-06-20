@@ -1,4 +1,4 @@
-YANDEX_KEY = 'AQVNw4gFgzgn7cJIOiD6iIqv3nxKiKpSjWVoSJO8'
+YANDEX_KEY = 'SomeKey'
 
 VOICE_LANGUAGE = 'ru-RU'
 

@@ -69,7 +69,7 @@ def register_handlers(dp: Dispatcher):
     dp.register_message_handler(send_welcome, commands=['start'], state=default_state)
 
     dp.register_message_handler(select_tanometr_start, Text(equals=strings.choice_tanometr_btn), state=default_state)
-    dp.register_message_handler(select_tanometr_cancle, Text(equals=strings.write_pressure_cancle_btn), state=SelectTanomenr.all_states)
+    dp.register_message_handler(select_tanometr_cancle, Text(equals=strings.choice_tanometr_cancle), state=SelectTanomenr.all_states)
     dp.register_message_handler(select_tanometr_cancle, commands=['cancle'], state=SelectTanomenr.all_states)
     dp.register_message_handler(select_tanometr_input, state=SelectTanomenr.waiting_for_input)
 

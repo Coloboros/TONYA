@@ -6,8 +6,19 @@
 
 ## Запуск
 
-Заполнить settings в tonya_server/source/settings.py и tonya_server/source/settings.py
+
+Заполнить settings в tonya_bot/source/settings.py и tonya_server/source/settings.py
+
+По настройкам видно что нужна Postgres база данных
 
 Создание сред с помощью python -m venv venv && pip install -r requirements.txt в tonya_bot и tonya_server
 
-запуск start.sh
+## Запуск ботов
+
+В среде tonya_bot запуск *python tonya_bot/bot.py*
+
+## Запуск сервера
+
+В среде tonya_bot запуск *gunicorn --bind 0.0.0.0:0000 tonya_bot/bot.py*
+
+0.0.0.0:0000 - где 0.0.0.0 это хост указанный в настройках ботов, 0000 порт
