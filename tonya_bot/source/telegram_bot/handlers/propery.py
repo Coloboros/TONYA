@@ -2,6 +2,7 @@ from os import stat
 from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup, default_state
+from aiogram.types import message
 from aiogram.types.reply_keyboard import KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from aiogram.types.message import ContentType
 from aiogram.dispatcher.filters import Text
@@ -13,10 +14,17 @@ from source.telegram_bot.bot import db, dp
 
 from source.telegram_bot.kb import home_kb
 import source.telegram_bot.strings as strings
-from source.settings import SERVER_HOST_AUTH_URL, SERVER_HOST_PROTOCOL
+from source.settings import SERVER_HOST_AUTH_URL, SERVER_HOST_PROTOCOL, SERVER_HOST
+
 
 import requests
 import json
+
+req_headers_json = {
+    'Content-type': 'application/json',
+    'Accept': 'text/plain',
+    'Content-Encoding': 'utf-8'
+}
 
 def is_float(str):
     try:
@@ -46,9 +54,16 @@ async def set_property_input_birthday(callback_query: types.CallbackQuery, state
     print(callback_query)
 
 
-async def set_property_input_birthday(callback_query: types.CallbackQuery, callback_data: dict):
+async def set_property_input_birthday(callback_query: types.CallbackQuery, callback_data: dict, state: FSMContext):
     selected, date = await DialogCalendar().process_selection(callback_query, callback_data)
     if selected:
+        data = {
+            "year": date.year,
+            "month": date.month,
+            "day": date.day,
+        }
+        await state.update_data(birthday=data)
+
         await callback_query.message.answer(
             f'{strings.set_property_select_birthday} {date.strftime("%d/%m/%Y")}\n{strings.set_property_input_height}',
         )
@@ -57,14 +72,28 @@ async def set_property_input_birthday(callback_query: types.CallbackQuery, callb
 
 async def set_property_input_height(message: types.Message, state: FSMContext):
     if message.text.isdigit():
-        print(message.text)
+        await state.update_data(height=int(message.text), user_id=message.from_user.id)
         await message.answer(strings.set_property_input_weidth)
         await PropertyStates.next()
     else:
         await message.answer(strings.set_property_input_height_invalid)
 
+url_set_poperty = SERVER_HOST_PROTOCOL + "://" + SERVER_HOST + 'user/set-property/'
+
 async def set_property_input_width(message: types.Message, state: FSMContext):
     if is_float(message.text):
+        await state.update_data(width=float(message.text))
+
+        response = requests.post(
+            url_set_poperty ,
+            data=json.dumps(await state.get_data()),
+            headers=req_headers_json)
+
+        if response.status_code != 200:
+            print(url_set_poperty)
+            print(response.status_code)
+            print('****ERROR**** upps in general select_tanometr_input')
+            print(await state.get_data())
         await message.answer(strings.set_property_select_finish, reply_markup=home_kb(message.from_user.id))
         await state.finish()
     else:

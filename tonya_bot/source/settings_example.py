@@ -1,17 +1,9 @@
-POSTGRES_PARAMS = {
-    'user': 'postgres',
-    'password': 'postgres',
-    'host': 'localhost',
-    'database': 'db',
-    'port': '5432'
-}
+import os
 
-TELEGRAM_BOT_TOKEN = 'postgresql://{}:{}@{}:{}/{}'.format(
-    POSTGRES_PARAMS['user'],
-    POSTGRES_PARAMS['password'],
-    POSTGRES_PARAMS['host'],
-    POSTGRES_PARAMS['port'],
-    POSTGRES_PARAMS['database']
-)
+BOT_TOKEN = 'Some Telegramm bot tocken'
 
-BOT_TOKEN = '123:qwe-ewq-asdsad'
+SERVER_HOST = '0.0.0.0:3253/api/'
+SERVER_HOST_AUTH_URL = '0.0.0.0:3253/api/user/auth'
+SERVER_HOST_PROTOCOL = 'http'
+
+SOURCE_PATH = os.path.split(__file__)[0]

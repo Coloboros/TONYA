@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}
+  Picients
+{% endblock title %}
+
+{% block content %}
+
+  <div class="im_transparent_wrapper im_toppadder80 im_bottompadder50">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 im_bottompadder50">
+          <div class="im_headingdiv">
+            <h2>Пациенты</h2>
+            <span><img src="images/heading_icon.png" class="img-responsive" alt=""></span>
+          </div>
+        </div>
+
+        {% for pacient in pacients %}
+
+          <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 im_bottompadder30">
+            <div class="im_team_div">
+              <span class="im-left-bottom-border"></span>
+              <img src="http://via.placeholder.com/263x269" class="img-responsive" alt="">
+              <div class="im_social_icon_div"></div>
+              <div class="im_team_content">
+                <h3>{{ pacient.name }}</h3>
+                <p>{{ pacient.id }}</p>
+              </div>
+            </div>
+          </div>
+
+        {% endfor %}
+
+      </div>
+    </div>
+  </div>
+
+{% endblock content %}

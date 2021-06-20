@@ -1,4 +1,6 @@
 from re import L
+from aiogram.types.base import Boolean
+from sqlalchemy.sql.expression import null
 from sqlalchemy.sql.functions import user
 from sqlalchemy.sql.operators import is_
 from sqlalchemy import update
@@ -27,6 +29,38 @@ class DataBase:
 
     def get_users(self):
         return self.session.query(User).all()
+
+    def set_tonometr(self, user: User, tonometr) -> Boolean:
+        if user == None:
+            return False
+
+        user.tonometr = tonometr
+        self.session.commit()
+
+        return True
+
+    def set_property(self, user: User, birthday, height, weight) -> Boolean:
+        if user == None:
+            return False
+
+        user.birthday = birthday
+        user.height = height
+        user.weight = weight
+        self.session.commit()
+
+        return True
+
+    def create_report(self, user, top_pressue, bot_pressue, pulse, tags) -> Boolean:
+        if user == null:
+            return False
+
+        n_report = TonometrReport(user.id, top_pressue, bot_pressue, pulse, tags)
+
+        self.session.add(n_report)
+        self.session.commit()
+
+        return True
+
 
     def get_user(self, user_id) -> User:
         finded_users = self.session.query(User).\

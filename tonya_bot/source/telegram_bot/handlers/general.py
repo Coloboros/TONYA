@@ -17,10 +17,11 @@ from source.telegram_bot.bot import dp, db, bot
 from source.telegram_bot.kb import home_kb
 import source.telegram_bot.strings as strings
 
-from source.settings import SERVER_HOST_AUTH_URL, SERVER_HOST_PROTOCOL
+from source.settings import SERVER_HOST_AUTH_URL, SERVER_HOST_PROTOCOL, SERVER_HOST
 
+import requests
 
-req_headers = {
+req_headers_json = {
     'Content-type': 'application/json',
     'Accept': 'text/plain',
     'Content-Encoding': 'utf-8'
@@ -40,7 +41,7 @@ async def send_welcome(message: types.Message):
     response = requests.post(
         SERVER_HOST_PROTOCOL + "://" + SERVER_HOST_AUTH_URL,
         data=json.dumps(data),
-        headers=req_headers)
+        headers=req_headers_json)
 
     await message.answer(strings.start_content, reply_markup=ReplyKeyboardRemove())
     await message.answer(strings.choice_tanometr, parse_mode='MarkdownV2')
@@ -52,7 +53,26 @@ async def select_tanometr_start(message: types.Message):
     await message.answer(strings.choice_tanometr, parse_mode='MarkdownV2', reply_markup=kb)
     await SelectTanomenr.next()
 
+
+url_set_tonometr = SERVER_HOST_PROTOCOL + "://" + SERVER_HOST + 'user/set-tonometr/'
+
 async def select_tanometr_input(message: types.Message, state: FSMContext):
+
+    data = {
+        "bot_type": "telegram",
+        "user_id": str(message.from_user.id),
+        "tonometr": message.text
+    }
+    response = requests.post(
+        url_set_tonometr,
+        data=json.dumps(data),
+        headers=req_headers_json)
+
+    if response.status_code != 200:
+        print(url_set_tonometr)
+        print(response.status_code)
+        print('****ERROR**** upps in general select_tanometr_input')
+
     await message.answer(strings.choice_tanometr_finish, parse_mode='MarkdownV2', reply_markup=home_kb(message.from_user.id))
     await state.finish()
 

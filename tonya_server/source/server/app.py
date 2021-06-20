@@ -1,12 +1,18 @@
+import os
+
+templates_path = os.path.join(os.sep.join(os.path.abspath(__file__).split(os.sep)[:-3]), 'templates')
+
 from flask import Flask
-app = Flask(__name__)
+
+app = Flask(__name__, template_folder=templates_path)
 
 from source.db.database import DataBase
 db = DataBase()
 
-import os
 routes_dir_name = 'routes'
 routes_path = os.path.join(os.path.dirname(__file__), routes_dir_name)
+
+
 
 for module in os.listdir(routes_path):
     if module == '__init__.py' or module[-3:] != '.py':

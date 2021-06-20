@@ -1,3 +1,4 @@
+import json
 from os import stat, wait
 from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
@@ -7,6 +8,8 @@ from aiogram.types.reply_keyboard import KeyboardButton, ReplyKeyboardMarkup, Re
 from aiogram.types.message import ContentType
 from aiogram.dispatcher.filters import Text
 
+from source.settings import SERVER_HOST_AUTH_URL, SERVER_HOST_PROTOCOL, SERVER_HOST
+
 from google.cloud import speech # type: ignore
 import requests
 import re
@@ -15,6 +18,13 @@ from source.telegram_bot.bot import dp, db, bot
 
 from source.telegram_bot.kb import home_kb
 import source.telegram_bot.strings as strings
+
+
+req_headers_json = {
+    'Content-type': 'application/json',
+    'Accept': 'text/plain',
+    'Content-Encoding': 'utf-8'
+}
 
 def is_int(s):
     try:
@@ -50,21 +60,27 @@ async def write_pressure_start(message: types.Message):
 
 def find_numbers(sentence):
     words = re.findall(r'\d+', sentence)
-    return [word for word in words if word.isdigit()]
+    return [int(word) for word in words if word.isdigit()]
 
 async def write_pressure_input_val(message: types.Message, state: FSMContext):
     vals = find_numbers(message.text)
     if (len(vals) == 3):
-        await message.answer(strings.write_pressure_input_tags, parse_mode='MarkdownV2')
+
+        kb = ReplyKeyboardMarkup(resize_keyboard=True)
+        kb.add('Бег', 'Подъём по лестнице', 'Долгая прогулка')
+        kb.row(strings.write_pressure_cancle_btn)
+
+        await message.answer(strings.write_pressure_input_tags, parse_mode='MarkdownV2', reply_markup=kb)
+        await state.update_data(vals=vals)
         await WritePressure.next()
         await WritePressure.next()
     else:
         await message.answer(strings.write_pressure_input_val_invalid)
 
-async def voice_message(message: types.Message):
+async def voice_message(message: types.Message, state:FSMContext):
     file_url = await message.voice.get_url()
     text = get_text_from_voice_url(file_url)
-    print(text)
+
     f = check_messge_val(text)
 
     ikb = InlineKeyboardMarkup()
@@ -74,7 +90,9 @@ async def voice_message(message: types.Message):
         InlineKeyboardButton("Внести заново", callback_data='repiat'))
 
     if f:
+        vals = find_numbers(text)
         await message.answer("Вы сказали: {}".format(text), reply_markup=ikb)
+        await state.update_data(vals=vals)
         await WritePressure.next()
     else:
         await message.answer("Вы сказали: {}".format(text))
@@ -85,7 +103,12 @@ async def callback_accapet(callback_query: types.CallbackQuery, state:FSMContext
     msg_id = callback_query.message.message_id
     await bot.edit_message_reply_markup(chat_id, msg_id, reply_markup=InlineKeyboardMarkup())
     await callback_query.answer(strings.write_pressure_input_tags)
-    await callback_query.message.answer(strings.write_pressure_input_tags)
+
+    kb = ReplyKeyboardMarkup(resize_keyboard=True)
+    kb.add('Бег', 'Подъём по лестнице', 'Долгая прогулка')
+    kb.row(strings.write_pressure_cancle_btn)
+
+    await callback_query.message.answer(strings.write_pressure_input_tags, reply_markup=kb)
     await WritePressure.next()
 
 async def callback_repiat(callback_query: types.CallbackQuery, state:FSMContext):
@@ -100,8 +123,19 @@ def check_messge_val(text):
     vals = find_numbers(text)
     return len(vals) == 3
 
+url_create_tonometr_report = SERVER_HOST_PROTOCOL + "://" + SERVER_HOST + 'user/set-tonometr-report/'
+
 async def write_pressure_input_tags(message: types.Message, state: FSMContext):
+    await state.update_data(tags=message.text)
+    await state.update_data(user_id=message.from_user.id)
     await message.answer(strings.write_pressure_finish, parse_mode='MarkdownV2', reply_markup=home_kb(message.from_user.id))
+
+
+    response = requests.post(
+        url_create_tonometr_report ,
+        data=json.dumps(await state.get_data()),
+        headers=req_headers_json)
+
     await state.finish()
 
 async def write_pressure_cancle(message: types.Message, state:FSMContext):
