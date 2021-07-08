@@ -119,7 +119,7 @@ async def voice_message(message: types.Message, state:FSMContext):
         await message.answer(strings.write_pressure_input_val_invalid)
 
 # Обработчик подтвержедения корректности голосового сообщения
-async def callback_accapet(callback_query: types.CallbackQuery, state:FSMContext):
+async def callback_accept(callback_query: types.CallbackQuery, state:FSMContext):
     chat_id = callback_query.message.chat.id
     msg_id = callback_query.message.message_id
     await bot.edit_message_reply_markup(chat_id, msg_id, reply_markup=InlineKeyboardMarkup())
@@ -176,7 +176,7 @@ def register_handlers(dp: Dispatcher):
     dp.register_message_handler(voice_message, content_types=ContentType.VOICE, state=WritePressure.waiting_for_val)
     dp.register_message_handler(write_pressure_input_tags, state=WritePressure.waiting_for_tags)
 
-    dp.register_callback_query_handler(callback_accapet, lambda cb: cb.data == "accept", state=WritePressure.waiting_for_accept)
+    dp.register_callback_query_handler(callback_accept, lambda cb: cb.data == "accept", state=WritePressure.waiting_for_accept)
     dp.register_callback_query_handler(callback_repiat, lambda cb: cb.data == "repiat", state=WritePressure.waiting_for_accept)
 
 
